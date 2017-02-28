@@ -37,10 +37,10 @@ cdef class fibq_it:
     cdef fibonacci_heap[pair[int, PyObject_ptr]].ordered_iterator end
 
     @staticmethod
-    cdef factory(fibonacci_heap[pair[int, PyObject_ptr]].ordered_iterator it,
+    cdef factory(fibonacci_heap[pair[int, PyObject_ptr]].ordered_iterator begin,
                  fibonacci_heap[pair[int, PyObject_ptr]].ordered_iterator end):
         it_ = fibq_it()
-        it_.it = it
+        it_.it = begin
         it_.end = end
         return it_
 
@@ -58,6 +58,10 @@ cdef class fibq:
 
     def __cinit__(self):
         self.c_fibq = fibq_type()
+
+    def __dealloc__(self):
+        for key in self:
+            Py_DECREF(key)
 
     def __init__(self, iterable=None):
         if isinstance(iterable, Mapping):
